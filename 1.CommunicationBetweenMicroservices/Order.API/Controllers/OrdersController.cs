@@ -1,7 +1,9 @@
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Order.API.Context;
 using Order.API.ViewModels;
+using Shared.Events;
 
 namespace Order.API.Controllers
 {
@@ -10,10 +12,12 @@ namespace Order.API.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly OrderApiDBContext _context;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrdersController(OrderApiDBContext context)
+        public OrdersController(OrderApiDBContext context, IPublishEndpoint publishEndpoint)
         {
             _context = context;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpPost]
@@ -36,6 +40,18 @@ namespace Order.API.Controllers
             };
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
+
+            OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent()
+            {
+                OrderId = order.Id,
+                BuyerId = order.BuyerId,
+                OrderItems = order.OrderItems.Select(x => new Shared.Messages.OrderItemMessage()
+                {
+                    ProductId = x.ProductId,
+                    Quantity = x.Quantity
+                }).ToList()
+            };
+            await _publishEndpoint.Publish(orderCreatedEvent);
             return Ok();
         }
     }

@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Order.API.Context;
 
@@ -14,7 +15,13 @@ builder.Services.AddDbContext<OrderApiDBContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("OrderApiConnectionString"));
 });
-
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["RabbitMq"]);
+    });
+});
 var app = builder.Build();
 
 // Middleware

@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -7,6 +7,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "1.CommunicationBetweenMicroservices\Shared\Shared.csproj", "{31D57C4B-8C37-5F4B-405A-75FCDCC078BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.API", "1.CommunicationBetweenMicroservices\Order.API\Order.API.csproj", "{FCEE272E-D9D5-51B2-D339-E81FE0795659}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.API", "1.CommunicationBetweenMicroservices\Stock.API\Stock.API.csproj", "{BEE24131-A105-4350-93ED-770744C0A79D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +24,10 @@ Global
 		{FCEE272E-D9D5-51B2-D339-E81FE0795659}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCEE272E-D9D5-51B2-D339-E81FE0795659}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCEE272E-D9D5-51B2-D339-E81FE0795659}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEE24131-A105-4350-93ED-770744C0A79D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEE24131-A105-4350-93ED-770744C0A79D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEE24131-A105-4350-93ED-770744C0A79D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEE24131-A105-4350-93ED-770744C0A79D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -29,6 +35,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{31D57C4B-8C37-5F4B-405A-75FCDCC078BC} = {A94F5389-0080-96D1-EAC3-99D5A93EDB29}
 		{FCEE272E-D9D5-51B2-D339-E81FE0795659} = {A94F5389-0080-96D1-EAC3-99D5A93EDB29}
+		{BEE24131-A105-4350-93ED-770744C0A79D} = {A94F5389-0080-96D1-EAC3-99D5A93EDB29}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADBB870-A750-4E0D-B5FD-83B79DBD831B}
