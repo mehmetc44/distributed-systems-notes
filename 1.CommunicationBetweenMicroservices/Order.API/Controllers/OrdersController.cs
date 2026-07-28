@@ -29,7 +29,7 @@ namespace Order.API.Controllers
                 Id = Guid.NewGuid(),
                 TotalPrice = (decimal)model.OrderItems.Sum(x => x.Price * x.Quantity),
                 CreatedDate = DateTime.Now,
-                OrderStatus = Order.API.Models.Enums.OrderStatus.Complated,
+                OrderStatus = Order.API.Models.Enums.OrderStatus.Completed,
                 BuyerId = model.BuyerId,
                 OrderItems = model.OrderItems.Select(x => new Order.API.Models.Entites.OrderItem()
                 {

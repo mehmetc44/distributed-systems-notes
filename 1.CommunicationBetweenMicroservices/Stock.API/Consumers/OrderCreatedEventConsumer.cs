@@ -11,12 +11,14 @@ namespace Stock.API.Consumers;
 public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
 {
     IMongoCollection<Stock.API.Models.Entites.Stock> _stockCollection;
+    IPublishEndpoint _publishEndpoint;
     ISendEndpointProvider _sendEndpointProvider;
 
-    public OrderCreatedEventConsumer(MongoDBService _mongoDbService, ISendEndpointProvider sendEndpointProvider)
+    public OrderCreatedEventConsumer(MongoDBService _mongoDbService, ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
     {
         _stockCollection = _mongoDbService.GetCollection<Stock.API.Models.Entites.Stock>();
         _sendEndpointProvider = sendEndpointProvider;
+        _publishEndpoint = publishEndpoint;
     }
     public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
     {
@@ -51,6 +53,16 @@ public class OrderCreatedEventConsumer : IConsumer<OrderCreatedEvent>
             };
             ISendEndpoint sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.Payment_StockReservedEventQueue}"));
             await sendEndpoint.Send(stockReservedEvent);
+        }
+        else
+        {
+            StockNotReservedEvent stockNotReservedEvent = new()
+            {
+                OrderId = context.Message.OrderId,
+                BuyerId = context.Message.BuyerId,
+                Message = "Stok yetersiz."
+            };
+            await _publishEndpoint.Publish(stockNotReservedEvent);
         }
         return;
     }
