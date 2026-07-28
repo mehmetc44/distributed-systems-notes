@@ -1,4 +1,5 @@
 using MassTransit;
+using MongoDB.Driver;
 using Shared.RabbitMQSetings;
 using Stock.API.Services;
 
@@ -21,6 +22,16 @@ builder.Services.AddMassTransit(x =>
         });
     });
 });
+
+using IServiceScope? scope = builder.Services.BuildServiceProvider().CreateScope();
+MongoDBService mongoDBService = scope.ServiceProvider.GetService<MongoDBService>();
+var collection = mongoDBService.GetCollection<Stock.API.Models.Entites.Stock>();
+if (collection.CountDocuments(FilterDefinition<Stock.API.Models.Entites.Stock>.Empty) == 0)
+{
+    await collection.InsertOneAsync(new () { Id = Guid.NewGuid(), ProductId = Guid.Parse("00000000-0000-0000-0000-000000000000"), Quantity = 100 });
+    await collection.InsertOneAsync(new () { Id = Guid.NewGuid(), ProductId = Guid.Parse("00000000-0000-0000-0000-000000000001"), Quantity = 200 });
+    await collection.InsertOneAsync(new () { Id = Guid.NewGuid(), ProductId = Guid.Parse("00000000-0000-0000-0000-000000000002"), Quantity = 300 });
+}
 
 builder.Services.AddControllers();
 

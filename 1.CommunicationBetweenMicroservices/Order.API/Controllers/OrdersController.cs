@@ -45,6 +45,7 @@ namespace Order.API.Controllers
             {
                 OrderId = order.Id,
                 BuyerId = order.BuyerId,
+                TotalPrice = order.TotalPrice,
                 OrderItems = order.OrderItems.Select(x => new Shared.Messages.OrderItemMessage()
                 {
                     ProductId = x.ProductId,

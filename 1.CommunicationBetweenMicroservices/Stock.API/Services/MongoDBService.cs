@@ -12,5 +12,5 @@ public class MongoDBService
         var client = new MongoClient(configuration.GetConnectionString("StockAPIMongoConnectionString"));
         _database = client.GetDatabase("StockDb");
     }
-
+    public IMongoCollection<T> GetCollection<T>()=> _database.GetCollection<T>(typeof(T).Name.ToLowerInvariant());
 }
