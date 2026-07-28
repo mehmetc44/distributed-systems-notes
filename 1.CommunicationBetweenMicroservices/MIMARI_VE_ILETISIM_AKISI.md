@@ -1,116 +1,333 @@
 # Mikroservis İletişim Mimarisi ve Akış Kılavuzu
 
-Bu doküman, e-ticaret sipariş sürecini simüle eden mikroservis projesinin iletişim mimarisini ve bileşenlerini açıklamaktadır. Proje, bir siparişin oluşturulmasından tamamlanmasına kadar olan süreci yönetmek için olay tabanlı (event-driven) bir mimari ve Saga Pattern kullanır.
-
-## Genel Bakış
-
-Proje 3 ana mikroservis, 1 paylaşımlı kütüphane ve bir mesajlaşma aracısından (Message Broker) oluşur:
-
--   **Order.API:** Siparişleri oluşturmaktan ve siparişin genel durumunu (başarılı, başarısız vb.) takip etmekten sorumludur.
--   **Stock.API:** Ürün stok durumunu yönetir. Gelen siparişlere göre stoğu ayırır.
--   **Payment.API:** Ödeme işlemlerini simüle eder. Stok ayrıldıktan sonra ödeme sürecini başlatır.
--   **Shared (Paylaşımlı Kütüphane):** Mikroservisler arasında ortak olan `Event` ve `Message` tanımlarını içerir. Bu sayede tüm servisler aynı kontrat üzerinden haberleşir.
--   **RabbitMQ (Message Broker):** Servisler arasındaki asenkron iletişimi sağlayan aracıdır. Olayları (Events) yayınlamak ve tüketmek (consume) için kullanılır.
+Bu doküman, e-ticaret sipariş sürecini simüle eden mikroservis projesinin iletişim mimarisini ve bileşenlerini açıklamaktadır. Proje, **Event-Driven Architecture (EDA)** ve **Saga Pattern (Choreography)** yaklaşımını kullanarak servisler arasında gevşek bağlı (loosely coupled), asenkron iletişim kurmaktadır.
 
 ---
 
-## Mimari İletişim Şeması (Saga Akışı)
+# Genel Mimari
 
-Aşağıdaki şema, bir sipariş oluşturulduğunda servisler arasında gerçekleşen olay akışını (Saga) göstermektedir.
+Proje aşağıdaki bileşenlerden oluşmaktadır:
+
+- **Order.API**
+  - Sipariş oluşturur.
+  - Sipariş durumunu yönetir.
+  - Ödeme veya stok sonucuna göre siparişi günceller.
+
+- **Stock.API**
+  - Sipariş geldiğinde stok kontrolü yapar.
+  - Yeterli stok varsa stoğu rezerve eder.
+  - Sonucu Event olarak yayınlar.
+
+- **Payment.API**
+  - Stok başarıyla ayrıldıktan sonra ödeme işlemini gerçekleştirir.
+  - Başarılı veya başarısız sonucu Event olarak yayınlar.
+
+- **Shared**
+  - Tüm servislerin ortak kullandığı Event ve Message sınıflarını içerir.
+  - Böylece servisler aynı kontrat üzerinden haberleşir.
+
+- **RabbitMQ**
+  - Mikroservisler arasındaki asenkron haberleşmeyi sağlayan Message Broker'dır.
+
+---
+
+# Saga Akışı
+
+Aşağıdaki diyagram sipariş oluşturulduktan sonra servisler arasında gerçekleşen olay akışını göstermektedir.
 
 ```mermaid
 sequenceDiagram
     participant Client as Müşteri
-    participant Order.API
+    participant OrderAPI as Order.API
     participant RabbitMQ
-    participant Stock.API
-    participant Payment.API
+    participant StockAPI as Stock.API
+    participant PaymentAPI as Payment.API
 
-    Client->>+Order.API: Yeni Sipariş Talebi (POST /api/orders)
-    Order.API->>Order.API: Siparişi 'Askıda' (Pending) olarak kaydet
-    Order.API-->>+RabbitMQ: **OrderCreatedEvent** yayınla
-    deactivate Order.API
-    
-    RabbitMQ-->>+Stock.API: OrderCreatedEvent'i tüket
-    Stock.API->>Stock.API: Stok kontrolü yap
-    alt Stok Mevcut
-        Stock.API->>Stock.API: Stoğu rezerve et/azalt
-        Stock.API-->>+RabbitMQ: **StockReservedEvent** yayınla
-    else Stok Mevcut Değil
-        Stock.API-->>+RabbitMQ: **StockNotReservedEvent** yayınla
-    end
-    deactivate Stock.API
+    Client->>OrderAPI: POST /api/orders
+    OrderAPI->>OrderAPI: Siparişi Pending olarak oluştur
+    OrderAPI-->>RabbitMQ: OrderCreatedEvent
 
-    alt Stok Rezerve Edildi
-        RabbitMQ-->>+Payment.API: StockReservedEvent'i tüket
-        Payment.API->>Payment.API: Ödeme işlemini gerçekleştir
-        alt Ödeme Başarılı
-            Payment.API-->>+RabbitMQ: **PaymentCompletedEvent** yayınla
-        else Ödeme Başarısız
-            Payment.API-->>+RabbitMQ: **PaymentFailedEvent** yayınla
-        end
-        deactivate Payment.API
-    end
+    RabbitMQ-->>StockAPI: OrderCreatedEvent
+    StockAPI->>StockAPI: Stok kontrolü
 
-    alt Nihai Durum Güncellemesi
-        
-        subDiagram Ödeme Başarılı Akışı
-            RabbitMQ-->>+Order.API: PaymentCompletedEvent'i tüket
-            Order.API->>Order.API: Sipariş durumunu 'Tamamlandı' (Completed) olarak güncelle
-            deactivate Order.API
+    alt Stok mevcut
+        StockAPI->>StockAPI: Stoğu rezerve et
+        StockAPI-->>RabbitMQ: StockReservedEvent
+
+        RabbitMQ-->>PaymentAPI: StockReservedEvent
+        PaymentAPI->>PaymentAPI: Ödeme işlemini gerçekleştir
+
+        alt Ödeme başarılı
+            PaymentAPI-->>RabbitMQ: PaymentCompletedEvent
+
+            RabbitMQ-->>OrderAPI: PaymentCompletedEvent
+            OrderAPI->>OrderAPI: Sipariş durumunu Completed yap
+
+        else Ödeme başarısız
+            PaymentAPI-->>RabbitMQ: PaymentFailedEvent
+
+            RabbitMQ-->>OrderAPI: PaymentFailedEvent
+            OrderAPI->>OrderAPI: Sipariş durumunu Failed yap
+
+            Note right of OrderAPI: Telafi edici işlem olarak stok serbest bırakılabilir.
+
         end
 
-        subDiagram Ödeme Başarısız Akışı
-             RabbitMQ-->>+Order.API: PaymentFailedEvent'i tüket
-             Order.API->>Order.API: Sipariş durumunu 'Başarısız' (Failed) olarak güncelle
-             Note right of Order.API: Telafi edici işlem: Stok serbest bırakılmalı (Bu projede simüle edilmemiştir)
-             deactivate Order.API
-        end
+    else Stok yetersiz
 
-        subDiagram Stok Yetersiz Akışı
-            RabbitMQ-->>+Order.API: StockNotReservedEvent'i tüket
-            Order.API->>Order.API: Sipariş durumunu 'Başarısız' (Failed) olarak güncelle
-            deactivate Order.API
-        end
+        StockAPI-->>RabbitMQ: StockNotReservedEvent
+
+        RabbitMQ-->>OrderAPI: StockNotReservedEvent
+
+        OrderAPI->>OrderAPI: Sipariş durumunu Failed yap
 
     end
-
 ```
 
 ---
 
-## Olaylar, Mesajlar ve Tüketiciler (Events, Messages & Consumers)
+# Olay (Event) Akışı
 
-Bu projede iletişim, **Olaylar (Events)** üzerinden sağlanır. Bir olay, geçmişte olmuş ve değiştirilemez bir durumu ifade eder (örn. "Sipariş Oluşturuldu"). Bu olayları dinleyen ve belirli iş mantıklarını tetikleyen yapılara **Tüketici (Consumer)** denir.
+Projede servisler birbirlerini doğrudan çağırmaz.
 
-### Paylaşımlı Varlıklar (`Shared` Projesi)
+Bunun yerine RabbitMQ üzerinden Event yayınlarlar.
 
--   **Konum:** `Shared/`
--   Tüm olay ve mesaj tanımları burada yer alır.
-    -   `Events/`: `OrderCreatedEvent`, `PaymentCompletedEvent` gibi tüm olayların sınıf tanımları.
-    -   `Messages/`: Servisler arası doğrudan komut göndermek için kullanılabilecek mesaj tanımları (örn: `OrderItemMessage`).
+Bu sayede servisler birbirlerinden bağımsız çalışabilir.
 
-### Olaylar ve Akışları
+## 1) OrderCreatedEvent
 
-| Olay (Event) | Yayınlayan Servis (Publisher) | Tüketen Servis (Consumer) | Açıklama |
-| :--- | :--- | :--- | :--- |
-| `OrderCreatedEvent` | **Order.API** | **Stock.API** | Yeni bir siparişin oluşturulduğunu ve stok işlemlerinin başlaması gerektiğini bildirir. |
-| `StockReservedEvent` | **Stock.API** | **Payment.API** | Sipariş için stokların başarıyla ayrıldığını ve ödeme sürecinin başlayabileceğini bildirir. |
-| `StockNotReservedEvent` | **Stock.API** | **Order.API** | Yetersiz stok nedeniyle siparişin devam edemeyeceğini bildirir. Sipariş durumu 'Başarısız' olarak güncellenir. |
-| `PaymentCompletedEvent`| **Payment.API** | **Order.API** | Ödemenin başarıyla tamamlandığını bildirir. Sipariş durumu 'Tamamlandı' olarak güncellenir. |
-| `PaymentFailedEvent` | **Payment.API** | **Order.API** | Ödemenin başarısız olduğunu bildirir. Sipariş durumu 'Başarısız' olarak güncellenir. |
+Publisher
 
-### Tüketiciler (Consumers)
+- Order.API
 
-Her servisin `Consumers/` klasöründe, belirli olayları dinleyen sınıflar bulunur.
+Consumer
 
--   **Order.API/Consumers/**
-    -   `PaymentCompletedEventConsumer.cs`: Ödeme başarılı olayını dinler.
-    -   `PaymentFailedEventConsumer.cs`: Ödeme başarısız olayını dinler.
-    -   `StockNotReservedConsumer.cs`: Stok yok olayını dinler.
+- Stock.API
 
--   **Stock.API/Consumers/**
-    -   `OrderCreatedEventConsumer.cs`: Sipariş oluşturuldu olayını dinler ve stok işlemlerini başlatır.
+Açıklama
 
--   **Payment.API/Consumers/**
-    -   `StockReservedEventConsumer.cs`: Stok ayrıldı olayını dinler ve ödeme işlemlerini başlatır.
+Yeni sipariş oluşturulduğunu bildirir.
+
+---
+
+## 2) StockReservedEvent
+
+Publisher
+
+- Stock.API
+
+Consumer
+
+- Payment.API
+
+Açıklama
+
+Stokların başarıyla ayrıldığını bildirir.
+
+---
+
+## 3) StockNotReservedEvent
+
+Publisher
+
+- Stock.API
+
+Consumer
+
+- Order.API
+
+Açıklama
+
+Yeterli stok bulunamadığını bildirir.
+
+Sipariş Failed durumuna geçirilir.
+
+---
+
+## 4) PaymentCompletedEvent
+
+Publisher
+
+- Payment.API
+
+Consumer
+
+- Order.API
+
+Açıklama
+
+Ödemenin başarılı olduğunu bildirir.
+
+Sipariş Completed durumuna geçirilir.
+
+---
+
+## 5) PaymentFailedEvent
+
+Publisher
+
+- Payment.API
+
+Consumer
+
+- Order.API
+
+Açıklama
+
+Ödemenin başarısız olduğunu bildirir.
+
+Sipariş Failed durumuna geçirilir.
+
+---
+
+# Event Tablosu
+
+| Event | Publisher | Consumer | Açıklama |
+|--------|-----------|----------|----------|
+| OrderCreatedEvent | Order.API | Stock.API | Sipariş oluşturulduğunu bildirir. |
+| StockReservedEvent | Stock.API | Payment.API | Stok başarıyla ayrıldı. |
+| StockNotReservedEvent | Stock.API | Order.API | Stok yetersiz. |
+| PaymentCompletedEvent | Payment.API | Order.API | Ödeme başarılı. |
+| PaymentFailedEvent | Payment.API | Order.API | Ödeme başarısız. |
+
+---
+
+# Consumer Yapısı
+
+## Order.API
+
+```
+Consumers
+├── PaymentCompletedEventConsumer.cs
+├── PaymentFailedEventConsumer.cs
+└── StockNotReservedConsumer.cs
+```
+
+### Görevleri
+
+- PaymentCompletedEvent dinler.
+- PaymentFailedEvent dinler.
+- StockNotReservedEvent dinler.
+
+Sipariş durumunu günceller.
+
+---
+
+## Stock.API
+
+```
+Consumers
+└── OrderCreatedEventConsumer.cs
+```
+
+### Görevi
+
+OrderCreatedEvent geldiğinde
+
+- stok kontrolü yapar
+- stok yeterliyse azaltır
+- StockReservedEvent yayınlar
+- değilse StockNotReservedEvent yayınlar.
+
+---
+
+## Payment.API
+
+```
+Consumers
+└── StockReservedEventConsumer.cs
+```
+
+### Görevi
+
+StockReservedEvent geldiğinde
+
+- ödeme işlemini gerçekleştirir
+- başarılıysa PaymentCompletedEvent yayınlar
+- başarısızsa PaymentFailedEvent yayınlar.
+
+---
+
+# Shared Projesi
+
+```
+Shared
+├── Events
+│   ├── OrderCreatedEvent.cs
+│   ├── StockReservedEvent.cs
+│   ├── StockNotReservedEvent.cs
+│   ├── PaymentCompletedEvent.cs
+│   └── PaymentFailedEvent.cs
+│
+├── Messages
+│   └── OrderItemMessage.cs
+│
+└── RabbitMQSettings
+    └── RabbitMQSettings.cs
+```
+
+Bu proje tüm mikroservisler tarafından referans alınmaktadır.
+
+Ortak Event tanımları burada bulunduğu için servisler aynı veri kontratı üzerinden haberleşmektedir.
+
+---
+
+# Kullanılan Tasarım Desenleri
+
+- Microservice Architecture
+- Event-Driven Architecture (EDA)
+- Saga Pattern (Choreography)
+- Publisher / Subscriber
+- Message Broker (RabbitMQ)
+- Consumer Pattern
+- Dependency Injection
+- Shared Contract Library
+
+---
+
+# Genel İş Akışı
+
+```
+Client
+    │
+    ▼
+Order.API
+    │
+    ▼
+RabbitMQ
+    │
+    ▼
+Stock.API
+    │
+    ├───────────────┐
+    │               │
+    ▼               ▼
+StockReserved   StockNotReserved
+    │               │
+    ▼               ▼
+RabbitMQ      RabbitMQ
+    │               │
+    ▼               ▼
+Payment.API    Order.API
+    │
+    ├───────────────┐
+    │               │
+    ▼               ▼
+PaymentCompleted  PaymentFailed
+    │               │
+    ▼               ▼
+RabbitMQ      RabbitMQ
+    │               │
+    └───────┬───────┘
+            ▼
+       Order.API
+            │
+            ▼
+Sipariş Durumu Güncellenir
+```
+
+---
+
+# Sonuç
+
+Bu mimaride servisler birbirlerini doğrudan çağırmamaktadır. Tüm iletişim RabbitMQ üzerinden Event yayınlama ve Event tüketme mantığı ile gerçekleşmektedir. Böylece servisler birbirinden bağımsız geliştirilebilir, ölçeklenebilir ve gerektiğinde farklı teknolojiler kullanılarak yeniden yazılabilir. Bu yaklaşım, gerçek dünyadaki dağıtık mikroservis sistemlerinde yaygın olarak kullanılan **Saga (Choreography)** mimarisinin temel bir örneğidir.
