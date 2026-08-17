@@ -1,15 +1,21 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<Coordinator.Context.TwoPhaseCommitContext>(options =>
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnectionString"));
+});
+
+builder.Services.AddHttpClient("OrderAPI", client =>{client.BaseAddress = new Uri("http://localhost:5220");});
+builder.Services.AddHttpClient("PaymentAPI", client =>{client.BaseAddress = new Uri("http://localhost:5115");});
+builder.Services.AddHttpClient("StockAPI", client =>{client.BaseAddress = new Uri("http://localhost:5201");});
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
