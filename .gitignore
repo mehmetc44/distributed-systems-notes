@@ -4,8 +4,20 @@
 !.env.example
 
 # Build results & binaries
+bin/
+Bin/
+BIN/
 [Bb]in/
+**/bin/
+**/Bin/
+
+obj/
+Obj/
+OBJ/
 [Oo]bj/
+**/obj/
+**/Obj/
+
 [Ll]og/
 [Ll]ogs/
 build/
