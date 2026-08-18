@@ -3,25 +3,42 @@
 .env.*
 !.env.example
 
-# Build results
+# Build results & binaries
 [Bb]in/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+build/
+artifacts/
 
-# Visual Studio / IDE
+# Visual Studio / VS Code / JetBrains / IDEs
 .vs/
 .vscode/
+.idea/
 *.user
 *.userosscache
 *.sln.docstates
-
-# Database files
-*.db
-*.sqlite
-
-# User-specific files
-*.rsuser
 *.suo
 *.user
 *.userHost
+*.rsuser
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Database & SQLite files
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# Test results
+TestResults/
+
+# Package files
+*.nupkg
+*.snupkg
+*.pkg
