@@ -1,0 +1,27 @@
+# Environment configuration
+.env
+.env.*
+!.env.example
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio / IDE
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Database files
+*.db
+*.sqlite
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userHost

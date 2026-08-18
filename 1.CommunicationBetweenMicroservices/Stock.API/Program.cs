@@ -1,7 +1,10 @@
 using MassTransit;
 using MongoDB.Driver;
+using Shared;
 using Shared.RabbitMQSetings;
 using Stock.API.Services;
+
+EnvLoader.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +18,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<Stock.API.Consumers.OrderCreatedEventConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration["RabbitMq"]);
+        cfg.Host(Environment.GetEnvironmentVariable("COMMUNICATION_BETWEEN_STOCK_API_RABBITMQ"));
         cfg.ReceiveEndpoint(RabbitMQSettings.Stock_OrderCreatedEventQueue, e =>
         {
             e.ConfigureConsumer<Stock.API.Consumers.OrderCreatedEventConsumer>(context);
@@ -24,7 +27,7 @@ builder.Services.AddMassTransit(x =>
 });
 
 using IServiceScope? scope = builder.Services.BuildServiceProvider().CreateScope();
-MongoDBService mongoDBService = scope.ServiceProvider.GetService<MongoDBService>();
+MongoDBService mongoDBService = scope.ServiceProvider.GetService<MongoDBService>()!;
 var collection = mongoDBService.GetCollection<Stock.API.Models.Entites.Stock>();
 if (collection.CountDocuments(FilterDefinition<Stock.API.Models.Entites.Stock>.Empty) == 0)
 {
@@ -46,6 +49,4 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
 app.Run();
-

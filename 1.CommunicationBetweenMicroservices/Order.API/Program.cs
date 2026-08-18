@@ -2,7 +2,10 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Order.API.Consumers;
 using Order.API.Context;
+using Shared;
 using Shared.RabbitMQSetings;
+
+EnvLoader.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +18,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<OrderApiDBContext>(options =>
 {
     options.UseSqlite(
-        builder.Configuration.GetConnectionString("OrderApiConnectionString"));
+        Environment.GetEnvironmentVariable("COMMUNICATION_BETWEEN_ORDER_API_CONNECTION_STRING"));
 });
 builder.Services.AddMassTransit(x =>
 {
@@ -24,7 +27,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<PaymentFailedEventConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration["RabbitMq"]);
+        cfg.Host(Environment.GetEnvironmentVariable("COMMUNICATION_BETWEEN_ORDER_API_RABBITMQ"));
         cfg.ReceiveEndpoint(RabbitMQSettings.Order_PaymentCompletedEventQueue, e =>{
             e.ConfigureConsumer<PaymentCompletedEventConsumer>(context);   
         });

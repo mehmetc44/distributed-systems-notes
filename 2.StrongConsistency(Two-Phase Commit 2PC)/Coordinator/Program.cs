@@ -1,6 +1,9 @@
 using Coordinator.Abstraction;
 using Coordinator.Services;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+
+LoadEnv();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<Coordinator.Context.TwoPhaseCommitContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnectionString"));
+    var connectionString = Environment.GetEnvironmentVariable("STRONG_CONSISTENCY_COORDINATOR_SQLITE_CONNECTION_STRING")
+        ?? builder.Configuration.GetConnectionString("SQLiteConnectionString");
+    options.UseSqlite(connectionString);
 });
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 
@@ -42,5 +47,30 @@ app.MapGet("/create-order-transaction", async (ITransactionService transactionSe
         await transactionService.RollbackAsync(transactionId);
 });
 
-
 app.Run();
+
+void LoadEnv()
+{
+    var currentDir = new DirectoryInfo(Directory.GetCurrentDirectory());
+    while (currentDir != null)
+    {
+        var filePath = Path.Combine(currentDir.FullName, ".env");
+        if (File.Exists(filePath))
+        {
+            foreach (var line in File.ReadAllLines(filePath))
+            {
+                var trimmed = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("#"))
+                    continue;
+
+                var parts = trimmed.Split('=', 2);
+                if (parts.Length == 2)
+                {
+                    Environment.SetEnvironmentVariable(parts[0].Trim(), parts[1].Trim());
+                }
+            }
+            break;
+        }
+        currentDir = currentDir.Parent;
+    }
+}

@@ -32,3 +32,9 @@
 /home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/obj/Debug/net8.0/Stock.API.pdb
 /home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/obj/Debug/net8.0/Stock.API.genruntimeconfig.cache
 /home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/obj/Debug/net8.0/ref/Stock.API.dll
+/home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/bin/Debug/net8.0/MassTransit.dll
+/home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/bin/Debug/net8.0/MassTransit.Abstractions.dll
+/home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/bin/Debug/net8.0/MassTransit.RabbitMqTransport.dll
+/home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/bin/Debug/net8.0/RabbitMQ.Client.dll
+/home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/bin/Debug/net8.0/Shared.dll
+/home/mehmet/Desktop/MicroservicesClass/3.EventualConsistencySagaChoreography/Stock.API/bin/Debug/net8.0/Shared.pdb
