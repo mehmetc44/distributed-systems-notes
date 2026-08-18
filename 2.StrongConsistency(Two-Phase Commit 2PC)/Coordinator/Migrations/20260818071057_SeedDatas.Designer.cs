@@ -3,6 +3,7 @@ using System;
 using Coordinator.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Coordinator.Migrations
 {
     [DbContext(typeof(TwoPhaseCommitContext))]
-    partial class TwoPhaseCommitContextModelSnapshot : ModelSnapshot
+    [Migration("20260818071057_SeedDatas")]
+    partial class SeedDatas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.19");
@@ -34,17 +37,17 @@ namespace Coordinator.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ea2c88b8-0896-4137-97f5-2bff282d137b"),
+                            Id = new Guid("8348a39d-d4fb-4a00-af75-05819135b895"),
                             Name = "Order.API"
                         },
                         new
                         {
-                            Id = new Guid("b8747a37-ca93-441d-a94c-0999bc8f6d0a"),
+                            Id = new Guid("98c2cb95-c782-4073-afc3-2ead98349519"),
                             Name = "Payment.API"
                         },
                         new
                         {
-                            Id = new Guid("9e09743e-46bb-475f-8974-cdbaea5ec83f"),
+                            Id = new Guid("6ddf110a-2d72-4c78-b4b4-4a4464b8ff8d"),
                             Name = "Stock.API"
                         });
                 });
@@ -61,9 +64,6 @@ namespace Coordinator.Migrations
                     b.Property<Guid>("NodeId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("TransactionId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("TransactionState")
                         .HasColumnType("INTEGER");
 
@@ -77,17 +77,12 @@ namespace Coordinator.Migrations
             modelBuilder.Entity("Coordinator.Models.NodeState", b =>
                 {
                     b.HasOne("Coordinator.Models.Node", "Node")
-                        .WithMany("NodeStates")
+                        .WithMany()
                         .HasForeignKey("NodeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Node");
-                });
-
-            modelBuilder.Entity("Coordinator.Models.Node", b =>
-                {
-                    b.Navigation("NodeStates");
                 });
 #pragma warning restore 612, 618
         }

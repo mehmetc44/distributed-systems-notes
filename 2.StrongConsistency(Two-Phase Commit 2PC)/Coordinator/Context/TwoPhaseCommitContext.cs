@@ -1,4 +1,5 @@
 using System;
+using Coordinator.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Coordinator.Context;
@@ -9,6 +10,15 @@ public class TwoPhaseCommitContext : DbContext
     {
     }
 
-    public DbSet<Models.Node> Nodes { get; set; }
-    public DbSet<Models.NodeState> NodeStates { get; set; }
+    public DbSet<Node> Nodes { get; set; }
+    public DbSet<NodeState> NodeStates { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Node>().HasData(
+            new Node("Order.API") { Id = Guid.NewGuid()},
+            new Node("Payment.API") { Id = Guid.NewGuid()},
+            new Node("Stock.API") { Id = Guid.NewGuid()}
+        );
+    }   
 }

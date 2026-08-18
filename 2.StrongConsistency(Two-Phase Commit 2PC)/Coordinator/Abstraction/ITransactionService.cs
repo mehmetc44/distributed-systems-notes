@@ -5,10 +5,10 @@ namespace Coordinator.Abstraction;
 public interface ITransactionService
 {
     Task<Guid> CreateTransactionAsync();
-    Task PrapareServicesAsync(Guid TransactionId);
-    Task<bool> CheckServicesReadyAsync(Guid TransactionId);
-    Task CommitAsync(Guid TransactionId);
-    Task CheckTransactionStateServicesAsync(Guid TransactionId);
-    Task RollBackAsync(Guid TransactionId);
+    Task PrepareServicesAsync(Guid transactionId);
+    Task<bool> CheckReadyServicesAsync(Guid transactionId);
+    Task CommitAsync(Guid transactionId);
+    Task<bool> CheckTransactionStateServicesAsync(Guid transactionId);
+    Task RollbackAsync(Guid transactionId);
 
 }
