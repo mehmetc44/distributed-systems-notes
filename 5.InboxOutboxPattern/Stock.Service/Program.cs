@@ -4,6 +4,8 @@ using Shared;
 using Stock.Service.Consumers;
 using Stock.Service.Models.Contexts;
 
+EnvLoader.Load();
+
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddDbContext<StockDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSSQLServer")));
@@ -13,7 +15,7 @@ builder.Services.AddMassTransit(configurator =>
     configurator.AddConsumer<OrderCreatedEventConsumer>();
     configurator.UsingRabbitMq((context, _configure) =>
     {
-        _configure.Host(builder.Configuration["RabbitMQ"]);
+        _configure.Host(Environment.GetEnvironmentVariable("INBOX_OUTBOX_RABBITMQ") ?? builder.Configuration["RabbitMQ"]);
 
         _configure.ReceiveEndpoint(RabbitMQSettings.Stock_OrderCreatedEvent, e => e.ConfigureConsumer<OrderCreatedEventConsumer>(context));
     });

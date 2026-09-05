@@ -7,6 +7,8 @@ using Shared;
 using Shared.Events;
 using System.Text.Json;
 
+EnvLoader.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -18,7 +20,7 @@ builder.Services.AddMassTransit(configurator =>
 {
     configurator.UsingRabbitMq((context, _configure) =>
     {
-        _configure.Host(builder.Configuration["RabbitMQ"]);
+        _configure.Host(Environment.GetEnvironmentVariable("INBOX_OUTBOX_RABBITMQ") ?? builder.Configuration["RabbitMQ"]);
     });
 });
 
@@ -59,23 +61,17 @@ app.MapPost("/create-order", async (CreateOrderVM model, OrderDbContext orderDbC
         }).ToList(),
         IdempotentToken = idempotentToken
     };
-    #region Outbox Pattern Olmaksýzýn!
-    //var sendEndpoint = await sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.Stock_OrderCreatedEvent}"));
-    //await sendEndpoint.Send<OrderCreatedEvent>(orderCreatedEvent);
-    #endregion
-    #region Outbox Pattern Çalýþmasý
+
     OrderOutbox orderOutbox = new()
     {
         OccuredOn = DateTime.UtcNow,
         ProcessedDate = null,
         Payload = JsonSerializer.Serialize(orderCreatedEvent),
-        //Type = orderCreatedEvent.GetType().Name
         Type = nameof(OrderCreatedEvent),
         IdempotentToken = idempotentToken
     };
     await orderDbContext.OrderOutboxes.AddAsync(orderOutbox);
     await orderDbContext.SaveChangesAsync();
-    #endregion
 });
 
 app.Run();
