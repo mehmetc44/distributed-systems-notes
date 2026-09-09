@@ -58,6 +58,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6.Traceability", "6.Traceab
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Application", "6.Traceability\Console.Application\Console.Application\Console.Application.csproj", "{1C460F1C-71BC-4650-9385-E2127CE1B404}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore.Application", "6.Traceability\AspNetCore.Application\AspNetCore.Application\AspNetCore.Application.csproj", "{98BD42E3-2C74-40AC-BAA6-F9361913017F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +154,10 @@ Global
 		{1C460F1C-71BC-4650-9385-E2127CE1B404}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C460F1C-71BC-4650-9385-E2127CE1B404}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C460F1C-71BC-4650-9385-E2127CE1B404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98BD42E3-2C74-40AC-BAA6-F9361913017F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98BD42E3-2C74-40AC-BAA6-F9361913017F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98BD42E3-2C74-40AC-BAA6-F9361913017F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98BD42E3-2C74-40AC-BAA6-F9361913017F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -179,6 +185,7 @@ Global
 		{2DB67219-6E1B-4B5D-8EFA-F8E3D5E3B6BD} = {58181E91-9D97-4AE3-B19D-55B5D493C38B}
 		{05946958-9198-41E3-B332-1501F0C330BC} = {58181E91-9D97-4AE3-B19D-55B5D493C38B}
 		{1C460F1C-71BC-4650-9385-E2127CE1B404} = {8BD500D5-82E1-435D-B183-55269DB53851}
+		{98BD42E3-2C74-40AC-BAA6-F9361913017F} = {8BD500D5-82E1-435D-B183-55269DB53851}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADBB870-A750-4E0D-B5FD-83B79DBD831B}
