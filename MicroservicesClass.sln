@@ -54,6 +54,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.API", "4.EventualCons
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "4.EventualConsistencySagaOrchestration\Shared\Shared.csproj", "{05946958-9198-41E3-B332-1501F0C330BC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6.Traceability", "6.Traceability", "{8BD500D5-82E1-435D-B183-55269DB53851}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Application", "6.Traceability\Console.Application\Console.Application\Console.Application.csproj", "{1C460F1C-71BC-4650-9385-E2127CE1B404}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -144,6 +148,10 @@ Global
 		{05946958-9198-41E3-B332-1501F0C330BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05946958-9198-41E3-B332-1501F0C330BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05946958-9198-41E3-B332-1501F0C330BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C460F1C-71BC-4650-9385-E2127CE1B404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C460F1C-71BC-4650-9385-E2127CE1B404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C460F1C-71BC-4650-9385-E2127CE1B404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C460F1C-71BC-4650-9385-E2127CE1B404}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -170,6 +178,7 @@ Global
 		{B4E05A29-1045-4437-BC43-FC64846C0DA8} = {58181E91-9D97-4AE3-B19D-55B5D493C38B}
 		{2DB67219-6E1B-4B5D-8EFA-F8E3D5E3B6BD} = {58181E91-9D97-4AE3-B19D-55B5D493C38B}
 		{05946958-9198-41E3-B332-1501F0C330BC} = {58181E91-9D97-4AE3-B19D-55B5D493C38B}
+		{1C460F1C-71BC-4650-9385-E2127CE1B404} = {8BD500D5-82E1-435D-B183-55269DB53851}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADBB870-A750-4E0D-B5FD-83B79DBD831B}
