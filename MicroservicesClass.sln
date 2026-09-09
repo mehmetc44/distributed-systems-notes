@@ -60,6 +60,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Application", "6.Tr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore.Application", "6.Traceability\AspNetCore.Application\AspNetCore.Application\AspNetCore.Application.csproj", "{98BD42E3-2C74-40AC-BAA6-F9361913017F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "6.Traceability\Message.Broker.Scenario\Shared\Shared.csproj", "{8EF66C36-38E7-4A75-92D9-310567C23C2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publisher", "6.Traceability\Message.Broker.Scenario\Publisher\Publisher.csproj", "{A23C785E-DAAA-4252-B68B-C1E2C3EE30D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -158,6 +162,14 @@ Global
 		{98BD42E3-2C74-40AC-BAA6-F9361913017F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98BD42E3-2C74-40AC-BAA6-F9361913017F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98BD42E3-2C74-40AC-BAA6-F9361913017F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EF66C36-38E7-4A75-92D9-310567C23C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EF66C36-38E7-4A75-92D9-310567C23C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EF66C36-38E7-4A75-92D9-310567C23C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EF66C36-38E7-4A75-92D9-310567C23C2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A23C785E-DAAA-4252-B68B-C1E2C3EE30D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A23C785E-DAAA-4252-B68B-C1E2C3EE30D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A23C785E-DAAA-4252-B68B-C1E2C3EE30D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A23C785E-DAAA-4252-B68B-C1E2C3EE30D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -186,6 +198,8 @@ Global
 		{05946958-9198-41E3-B332-1501F0C330BC} = {58181E91-9D97-4AE3-B19D-55B5D493C38B}
 		{1C460F1C-71BC-4650-9385-E2127CE1B404} = {8BD500D5-82E1-435D-B183-55269DB53851}
 		{98BD42E3-2C74-40AC-BAA6-F9361913017F} = {8BD500D5-82E1-435D-B183-55269DB53851}
+		{8EF66C36-38E7-4A75-92D9-310567C23C2A} = {8BD500D5-82E1-435D-B183-55269DB53851}
+		{A23C785E-DAAA-4252-B68B-C1E2C3EE30D6} = {8BD500D5-82E1-435D-B183-55269DB53851}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADBB870-A750-4E0D-B5FD-83B79DBD831B}
